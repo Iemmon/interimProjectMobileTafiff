@@ -1,7 +1,5 @@
 package mobileConnection.controller;
 
-import mobileConnection.view.TariffView;
-
 import java.util.Scanner;
 
 public class InputUtility {

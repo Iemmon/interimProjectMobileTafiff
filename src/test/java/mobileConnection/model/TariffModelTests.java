@@ -13,7 +13,6 @@ import java.util.List;
 public class TariffModelTests {
 
     TariffModel model;
-
     BasicTariff one;
     BasicTariff two;
     BasicTariff three;

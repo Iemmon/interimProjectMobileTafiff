@@ -12,13 +12,7 @@ public class TariffModel {
     Operator operator;
 
     public void createOperator(String name) {
-        this.operator = new Operator(name);
-        operator.addTariff(new CallAndSMSTariff("Молодежный!", 15, 10, 25, 940, 0.5));
-        operator.addTariff(new BusinessTariff("Бизнес", 15, 15, 40, 1250));
-        operator.addTariff(new BusinessTariff("Большой Босс", 10, 12, 45, 1060));
-        operator.addTariff(new DigitalTariff("Диджитал Офис", 25, 25, 1200));
-        operator.addTariff(new FamilyTariff("Вместе", 10, 5, 1.5, 80, 0.2));
-        operator.addTariff(new PremiumTariff("Все включено", 0.4, 500));
+        operator = new Operator(name);
     }
 
     public List<BasicTariff> sortTariffByFee() {

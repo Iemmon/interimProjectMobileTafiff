@@ -11,13 +11,14 @@ public class Operator {
     private String name;
     final List<BasicTariff> tariffs;
     final List<SimCard> soldSimCards;
+    private DataPlacer dataPlacer;
 
     public Operator(String companyName) {
-
+        dataPlacer = new DataPlacer();
         this.name = companyName;
 
-        this.tariffs = new ArrayList<>();
-        this.soldSimCards = new ArrayList<>();
+        this.tariffs = new ArrayList<>(dataPlacer.getTariffs());
+        this.soldSimCards = new ArrayList<>(dataPlacer.getSimCards());
     }
 
     public boolean addTariff(BasicTariff tariff) {
@@ -40,7 +41,7 @@ public class Operator {
         return result;
     }
 
-    class SimCard {
+    static class SimCard {
         private BasicTariff tariff;
         private LocalDateTime dateOfConnection;
 
