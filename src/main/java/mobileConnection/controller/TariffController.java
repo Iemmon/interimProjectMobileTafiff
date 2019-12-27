@@ -2,11 +2,9 @@ package mobileConnection.controller;
 
 import mobileConnection.model.TariffFilter;
 import mobileConnection.model.TariffModel;
-import mobileConnection.model.entity.tariff.BasicTariff;
 import mobileConnection.model.entity.tariff.TariffField;
 import mobileConnection.view.TariffView;
 
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,69 +22,63 @@ public class TariffController {
     public void run() {
 
         while (true) {
-
-            view.print("Application Main Menu:");
+            view.print("CHOOSE OPTION: ");
             for (MenuOption option : MenuOption.values()) {
                 view.print(option.info);
             }
-
-            String input = getValidInput();
+            MenuOption input = getValidInput();
 
             switch (input) {
-                case "SHOW":
-                    view.print(Converter.anyListToString(model.getOperator().getTariffs().toArray(), "\n-------\n", false));
+                case SHOW:
+                    showTariffs();
                     break;
-                case "ADD":
+                case ADD:
                     addTariff();
                     break;
-                case "FIND":
-                    view.print(Converter.anyListToString(searchTariff().toArray(), "\n", true));
+                case FIND:
+                    searchTariff();
                     break;
-                case "SORT":
-                    view.print(Converter.anyListToString(model.sortTariffByFee().toArray(), "\n--------\n", true));
+                case SORT:
+                    sortByFee();
                     break;
-                case "DELETE":
+                case DELETE:
                     removeTariff();
                     break;
-                case "CLIENTS":
-                    view.print("Enter tariff name: ");
-                    int numOfClients = model.getOperator().getNumOfClientsByTariff(InputUtility.scanForInput());
-                    view.print("Number of clients :" + numOfClients);
+                case CLIENTS:
+                    getNumOfClients();
                     break;
-                case "END":
+                case END:
                     System.exit(0);
             }
-
             view.print("\n");
         }
     }
 
-
     private void removeTariff() {
         view.print("Enter tariff name to delete: ");
         String tariffName = InputUtility.scanForInput();
-        if (model.deleteTariff(tariffName))
+        if (model.deleteTariff(tariffName)) {
             view.print(tariffName + " was successfully deleted!");
-        else
+        } else {
             view.print(tariffName + " was NOT deleted!");
-
+        }
     }
 
-    private List<BasicTariff> searchTariff() {
+    private void searchTariff() {
 
         TariffFilter filter = model.getOperator().getFilter();
 
         while (true) {
-            view.print("Add parameters to search by: ");
+            view.print("Choose parameters to search by: ");
             view.print(Converter.anyListToString(TariffField.values(), ", ", false));
-            view.print("Enter values like this: [Search parameter] [min value] [max value]");
-            view.print("Or type anything else to exit and see result");
+            view.print("Enter in the following order: [Search parameter] [min value] [max value]");
+            view.print("Or type anything else to exit and see the result");
 
             String inputString = InputUtility.scanForInput();
-            Pattern pattern = Pattern.compile("(?<param>(" + Converter.anyListToString(TariffField.values(), "|", false)+ "))\\s(?<left>\\d+)\\s(?<right>\\d+)", Pattern.CASE_INSENSITIVE);
+            Pattern pattern = Pattern.compile("(?<param>(" + Converter.anyListToString(TariffField.values(), "|", false) + "))\\s(?<left>\\d+)\\s(?<right>\\d+)", Pattern.CASE_INSENSITIVE);
             Matcher matcher = pattern.matcher(inputString);
 
-            if(matcher.matches()){
+            if (matcher.matches()) {
                 String param = matcher.group("param").toUpperCase();
                 int left = Integer.parseInt(matcher.group("left"));
                 int right = Integer.parseInt(matcher.group("right"));
@@ -97,10 +89,10 @@ public class TariffController {
                 break;
             }
         }
-        return filter.getTariffs();
+        view.print(Converter.anyListToString(filter.getTariffs().toArray(), "\n", true));
     }
 
-    private String getValidInput() {
+    private MenuOption getValidInput() {
         String input;
         while (true) {
             input = InputUtility.scanForInput().trim().toUpperCase();
@@ -109,16 +101,16 @@ public class TariffController {
             }
             view.print("Invalid value, try again: ");
         }
-        return input;
+        return MenuOption.valueOf(input);
 
     }
 
-    private void addTariff(){
-        view.print("Enter values like this: [Tariff name]/[sms price]/[minute price]/[internet price]/[monthly fee] ");
+    private void addTariff() {
+        view.print("Enter values like this: Tariff name/sms price/minute price/internet price/monthly fee ");
         String tariffString = InputUtility.scanForInput();
         Pattern pattern = Pattern.compile("(?<name>[^\\/]+)\\/(?<sms>\\d+[.,]?\\d*)\\/(?<minute>\\d+[.,]?\\d*)\\/(?<mb>\\d+[.,]?\\d*)\\/(?<fee>\\d+)");
         Matcher matcher = pattern.matcher(tariffString);
-        if(matcher.matches()){
+        if (matcher.matches()) {
             model.createTariff(
                     matcher.group("name"),
                     matcher.group("sms"),
@@ -130,5 +122,19 @@ public class TariffController {
         } else {
             view.print("Invalid value, try again: ");
         }
+    }
+
+    private void showTariffs() {
+        view.print(Converter.anyListToString(model.getOperator().getTariffs().toArray(), "\n-------\n", false));
+    }
+
+    private void sortByFee() {
+        view.print(Converter.anyListToString(model.sortTariffByFee().toArray(), "\n--------\n", true));
+    }
+
+    private void getNumOfClients() {
+        view.print("Enter tariff name: ");
+        int numOfClients = model.getOperator().getNumOfClientsByTariff(InputUtility.scanForInput());
+        view.print("Number of clients :" + numOfClients);
     }
 }
