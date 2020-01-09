@@ -7,13 +7,15 @@ import java.util.List;
 import java.util.Random;
 
 public class DataPlacer {
-    List<BasicTariff> tariffs;
-    List<Operator.SimCard> simCards;
+    private List<BasicTariff> tariffs;
+    private List<Operator.SimCard> simCards;
+    private String operatorName;
 
 
-   public DataPlacer(){
+   DataPlacer(){
         tariffs = setUpTariffs();
         simCards = setUpSimCards();
+        operatorName = "MTS";
     }
 
     private List<BasicTariff> setUpTariffs(){
@@ -38,11 +40,15 @@ public class DataPlacer {
         return simCardList;
     }
 
-    public List<BasicTariff> getTariffs() {
+    List<BasicTariff> getTariffs() {
         return tariffs;
     }
 
-    public List<Operator.SimCard> getSimCards() {
+    List<Operator.SimCard> getSimCards() {
         return simCards;
+    }
+
+    String getOperatorName() {
+        return operatorName;
     }
 }

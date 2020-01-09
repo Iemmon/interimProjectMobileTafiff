@@ -1,4 +1,4 @@
-package mobileConnection.controller;
+package mobileConnection.controller.utilities;
 
 import java.util.Scanner;
 

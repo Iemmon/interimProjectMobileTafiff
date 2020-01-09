@@ -1,7 +1,6 @@
 package mobileConnection.model;
 
 import mobileConnection.model.entity.tariff.BasicTariff;
-import mobileConnection.model.entity.tariff.TariffField;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +13,7 @@ public class TariffFilter<T extends BasicTariff> {
         this.tariffs = tariffs;
     }
 
-    public TariffFilter getByFee(int min, int max) {
+    private TariffFilter getByFee(int min, int max) {
         List<T> result = new ArrayList<>();
         for (T t : tariffs) {
             if (t.getFee() >= min && t.getFee() <= max) {
@@ -24,7 +23,7 @@ public class TariffFilter<T extends BasicTariff> {
         return new TariffFilter(result);
     }
 
-    public TariffFilter getBySMSCost(int min, int max) {
+    private TariffFilter getBySMSCost(int min, int max) {
         List<T> result = new ArrayList<>();
         for (T t : tariffs) {
             if (t.getCostOfSMS() >= min && t.getCostOfSMS() <= max) {
@@ -35,7 +34,7 @@ public class TariffFilter<T extends BasicTariff> {
         return new TariffFilter(result);
     }
 
-    public TariffFilter getByCallCost(int min, int max) {
+    private TariffFilter getByCallCost(int min, int max) {
         List<T> result = new ArrayList<>();
         for (T t : tariffs) {
             if (t.getCostPerMinute() >= min && t.getCostPerMinute() <= max) {
@@ -45,7 +44,7 @@ public class TariffFilter<T extends BasicTariff> {
         return new TariffFilter(result);
     }
 
-    public TariffFilter getByMbCost(int min, int max) {
+    private TariffFilter getByMbCost(int min, int max) {
         List<T> result = new ArrayList<>();
         for (T t : tariffs) {
             if (t.getCostOfMb() >= min && t.getCostOfMb() <= max) {
@@ -58,14 +57,14 @@ public class TariffFilter<T extends BasicTariff> {
 
     public TariffFilter getTariffsByParameter(String input, int min, int max) {
 
-        switch (TariffField.valueOf(input)) {
-            case FEE:
+        switch (input) {
+            case "FEE":
                 return getByFee(min, max);
-            case SMS:
+            case "SMS":
                 return getBySMSCost(min, max);
-            case MINUTE:
+            case "MINUTE":
                 return getByCallCost(min, max);
-            case MB:
+            case "MB":
                 return getByMbCost(min, max);
         }
 

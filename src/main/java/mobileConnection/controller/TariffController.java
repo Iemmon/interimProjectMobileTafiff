@@ -1,11 +1,11 @@
 package mobileConnection.controller;
 
+import mobileConnection.controller.utilities.Converter;
+import mobileConnection.controller.utilities.InputUtility;
 import mobileConnection.model.TariffFilter;
 import mobileConnection.model.TariffModel;
-import mobileConnection.model.entity.tariff.TariffField;
 import mobileConnection.view.TariffView;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TariffController {
@@ -16,19 +16,16 @@ public class TariffController {
     public TariffController(TariffModel model, TariffView view) {
         this.model = model;
         this.view = view;
-        this.model.createOperator("MTS");
     }
 
     public void run() {
-
         while (true) {
-            view.print("CHOOSE OPTION: ");
             for (MenuOption option : MenuOption.values()) {
                 view.print(option.info);
             }
-            MenuOption input = getValidInput();
+            String input = getValidInput(Converter.anyListToString(MenuOption.values(), "|", false));
 
-            switch (input) {
+            switch (MenuOption.valueOf(input.toUpperCase())) {
                 case SHOW:
                     showTariffs();
                     break;
@@ -50,78 +47,47 @@ public class TariffController {
                 case END:
                     System.exit(0);
             }
-            view.print("\n");
         }
     }
 
     private void removeTariff() {
-        view.print("Enter tariff name to delete: ");
+        view.print(Message.ENTER_NAME.toString());
         String tariffName = InputUtility.scanForInput();
         if (model.deleteTariff(tariffName)) {
-            view.print(tariffName + " was successfully deleted!");
+            view.print(tariffName + Message.DELETED);
         } else {
-            view.print(tariffName + " was NOT deleted!");
+            view.print(tariffName + Message.NOT_DELETED);
         }
     }
 
     private void searchTariff() {
-
+        view.print(Message.INPUT_EXAMPLE_SEARCH.toString());
         TariffFilter filter = model.getOperator().getFilter();
-
         while (true) {
-            view.print("Choose parameters to search by: ");
-            view.print(Converter.anyListToString(TariffField.values(), ", ", false));
-            view.print("Enter in the following order: [Search parameter] [min value] [max value]");
-            view.print("Or type anything else to exit and see the result");
-
-            String inputString = InputUtility.scanForInput();
-            Pattern pattern = Pattern.compile("(?<param>(" + Converter.anyListToString(TariffField.values(), "|", false) + "))\\s(?<left>\\d+)\\s(?<right>\\d+)", Pattern.CASE_INSENSITIVE);
-            Matcher matcher = pattern.matcher(inputString);
-
-            if (matcher.matches()) {
-                String param = matcher.group("param").toUpperCase();
-                int left = Integer.parseInt(matcher.group("left"));
-                int right = Integer.parseInt(matcher.group("right"));
-                filter = filter.getTariffsByParameter(param, Math.min(left, right), Math.max(left, right));
-
+            String inputString = getValidInput("((SMS|MINUTE|MB|FEE)\\s(\\d+)\\s(\\d+))|END");
+            String[] result = inputString.split("\\s");
+            if (!inputString.equals("END")) {
+                filter = filter.getTariffsByParameter(result[0].toUpperCase(),
+                                Math.min(Integer.parseInt(result[1]), Integer.parseInt(result[2])),
+                                Math.max(Integer.parseInt(result[1]), Integer.parseInt(result[2])));
+                view.print(Message.FILTER_APPLIED.toString());
             } else {
-                view.print("Invalid value, returning results... ");
+                if( filter.getTariffs().size() == 0){
+                    view.print(Message.NO_RESULT.toString());
+                } else {
+                    view.print(Converter.anyListToString( filter.getTariffs().toArray(), "\n", true));
+                }
                 break;
             }
         }
-        view.print(Converter.anyListToString(filter.getTariffs().toArray(), "\n", true));
-    }
-
-    private MenuOption getValidInput() {
-        String input;
-        while (true) {
-            input = InputUtility.scanForInput().trim().toUpperCase();
-            if (input.matches("(" + Converter.anyListToString(MenuOption.values(), "|", false) + ")")) {
-                break;
-            }
-            view.print("Invalid value, try again: ");
-        }
-        return MenuOption.valueOf(input);
-
     }
 
     private void addTariff() {
-        view.print("Enter values like this: Tariff name/sms price/minute price/internet price/monthly fee ");
-        String tariffString = InputUtility.scanForInput();
-        Pattern pattern = Pattern.compile("(?<name>[^\\/]+)\\/(?<sms>\\d+[.,]?\\d*)\\/(?<minute>\\d+[.,]?\\d*)\\/(?<mb>\\d+[.,]?\\d*)\\/(?<fee>\\d+)");
-        Matcher matcher = pattern.matcher(tariffString);
-        if (matcher.matches()) {
-            model.createTariff(
-                    matcher.group("name"),
-                    matcher.group("sms"),
-                    matcher.group("minute"),
-                    matcher.group("mb"),
-                    matcher.group("fee")
-            );
-            view.print("Tariff created and added to list");
-        } else {
-            view.print("Invalid value, try again: ");
-        }
+        view.print(Message.INPUT_EXAMPLE_ADD.toString());
+        String tariffString = getValidInput("([^\\/]+)\\/(\\d+[.]?\\d*)\\/(\\d+[.]?\\d*)\\/(\\d+[.,]?\\d*)\\/(\\d+)");
+        String[] tariffData = tariffString.split("/");
+        model.createTariff(tariffData[0], tariffData[1], tariffData[2], tariffData[3], tariffData[4]);
+        view.print(Message.TARIFF_CREATED.toString());
     }
 
     private void showTariffs() {
@@ -133,8 +99,17 @@ public class TariffController {
     }
 
     private void getNumOfClients() {
-        view.print("Enter tariff name: ");
+        view.print(Message.ENTER_NAME.toString());
         int numOfClients = model.getOperator().getNumOfClientsByTariff(InputUtility.scanForInput());
-        view.print("Number of clients :" + numOfClients);
+        view.print(Message.NUM_OF_CLIENTS.toString() + numOfClients);
+    }
+
+    private String getValidInput(String patternStr) {
+        String input = InputUtility.scanForInput();
+        while (!Pattern.compile(patternStr, Pattern.CASE_INSENSITIVE).matcher(input).matches()) {
+            view.print(Message.INVALID_VALUE.toString());
+            input = InputUtility.scanForInput();
+        }
+        return input.toUpperCase();
     }
 }

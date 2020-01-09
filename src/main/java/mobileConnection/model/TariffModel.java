@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Optional;
 
 public class TariffModel {
-    Operator operator;
+    private Operator operator;
 
-    public void createOperator(String name) {
-        operator = new Operator(name);
+    public TariffModel() {
+        operator = new Operator();
     }
 
     public List<BasicTariff> sortTariffByFee() {
@@ -26,8 +26,8 @@ public class TariffModel {
         return result;
     }
 
-    public boolean createTariff(String name, String sms, String minute, String mb, String fee) {
-        return operator.addTariff(
+    public void createTariff(String name, String sms, String minute, String mb, String fee) {
+        operator.addTariff(
                 new BasicTariff(name, Double.parseDouble(minute),
                         Double.parseDouble(sms),
                         Double.parseDouble(mb),
@@ -38,9 +38,7 @@ public class TariffModel {
 
     public boolean deleteTariff(String name) {
         Optional<BasicTariff> tariff = operator.getTariffByName(name);
-        if (tariff.isPresent())
-            return operator.getTariffs().remove(tariff.get());
-        return false;
+        return tariff.map(basicTariff -> operator.getTariffs().remove(basicTariff)).orElse(false);
     }
 
     public Operator getOperator() {

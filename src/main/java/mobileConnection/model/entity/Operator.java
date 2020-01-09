@@ -9,16 +9,15 @@ import java.util.*;
 public class Operator {
 
     private String name;
-    final List<BasicTariff> tariffs;
+    private final List<BasicTariff> tariffs;
     final List<SimCard> soldSimCards;
-    private DataPlacer dataPlacer;
 
-    public Operator(String companyName) {
-        dataPlacer = new DataPlacer();
-        this.name = companyName;
+    public Operator() {
+        DataPlacer dataPlacer = new DataPlacer();
 
-        this.tariffs = new ArrayList<>(dataPlacer.getTariffs());
-        this.soldSimCards = new ArrayList<>(dataPlacer.getSimCards());
+        tariffs = new ArrayList<>(dataPlacer.getTariffs());
+        soldSimCards = new ArrayList<>(dataPlacer.getSimCards());
+        name = dataPlacer.getOperatorName();
     }
 
     public boolean addTariff(BasicTariff tariff) {

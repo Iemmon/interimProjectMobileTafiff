@@ -1,6 +1,6 @@
 package mobileConnection.model.entity.tariff;
 
-public class CallAndSMSTariff extends BasicTariff{
+public class CallAndSMSTariff extends BasicTariff {
 
     private double discount;
 
